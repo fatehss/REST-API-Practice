@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.database import get_db
 from app.models import User, Review, Order
 from sqlalchemy.orm import Session
-from .schemas.user import UserBase, UserCreate, UserGetResponse, UserUpdate
+from .schemas.users import UserBase, UserCreate, UserGetResponse, UserUpdate
 import bcrypt
 router = APIRouter()
 
