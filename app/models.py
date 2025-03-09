@@ -2,7 +2,18 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Float, Enum
 from sqlalchemy.orm import relationship
 from .database import Base
 
-class User(Base):
+
+from datetime import datetime
+from sqlalchemy import Column, DateTime
+from sqlalchemy.orm import declarative_mixin
+
+@declarative_mixin
+class TimestampMixin:
+    time_now = datetime.now()
+    created_at = Column(DateTime, default=time_now, nullable=False)
+    updated_at = Column(DateTime, default=time_now, onupdate=time_now, nullable=False)
+
+class User(Base, TimestampMixin):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -15,7 +26,7 @@ class User(Base):
     reviews = relationship("Review", back_populates="user")
 
 
-class Product(Base):
+class Product(Base, TimestampMixin):
     __tablename__ = "products"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -28,7 +39,7 @@ class Product(Base):
     order_items = relationship("OrderItem", back_populates="product")  # New relation
 
 
-class Order(Base):
+class Order(Base, TimestampMixin):
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -41,7 +52,7 @@ class Order(Base):
     order_items = relationship("OrderItem", back_populates="order")  # Fix: Now correctly references `OrderItem`
 
 
-class OrderItem(Base):  # ✅ NEW TABLE for Many-to-Many relationship between Orders and Products
+class OrderItem(Base, TimestampMixin):  # ✅ NEW TABLE for Many-to-Many relationship between Orders and Products
     __tablename__ = "order_items"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -54,7 +65,7 @@ class OrderItem(Base):  # ✅ NEW TABLE for Many-to-Many relationship between Or
     product = relationship("Product", back_populates="order_items")
 
 
-class Payment(Base):
+class Payment(Base, TimestampMixin):
     __tablename__ = "payments"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -66,7 +77,7 @@ class Payment(Base):
     order = relationship("Order", back_populates="payments")
 
 
-class Review(Base):
+class Review(Base, TimestampMixin):
     __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True, index=True)
