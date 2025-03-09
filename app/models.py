@@ -33,7 +33,6 @@ class Product(Base, TimestampMixin):
     name = Column(String, nullable=False)
     description = Column(String)
     price = Column(Float, nullable=False)
-    stock = Column(Integer, nullable=False)
 
     reviews = relationship("Review", back_populates="product")
     order_items = relationship("OrderItem", back_populates="product")  # New relation
