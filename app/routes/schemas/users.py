@@ -15,6 +15,10 @@ class UserCreate(UserBase):  # For a create user endpoint
 class UserGetResponse(UserBase):  # For a get user endpoint
     id: int
 
+class UserUpdate(BaseModel):
+    name: str | None = None
+    password: str | None = None
+
         
 
         
