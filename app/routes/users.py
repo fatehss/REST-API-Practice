@@ -4,12 +4,30 @@ from app.models import User, Review, Order
 from sqlalchemy.orm import Session
 from .schemas.users import UserBase, UserCreate, UserGetResponse, UserUpdate
 import bcrypt
+import re
+
 router = APIRouter()
+
+def validate_user_name(name: str):
+    if len(name) < 3:
+        raise ValueError("Name must be at least 3 characters")
+def validate_email(email: str):
+    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+        raise ValueError("Invalid email")
+def validate_password(password: str):
+    if len(password) < 8:
+        raise ValueError("Password must be at least 8 characters long")
 
 
 @router.post("/users")
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     # Check if user already exists
+    try:
+        validate_user_name(user.name)
+        validate_email(user.email)
+        validate_password(user.password)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=409, detail="User already exists")
@@ -26,6 +44,7 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user) # reload the user with the ID
     
     return UserGetResponse(id=new_user.id, name=new_user.name, email=new_user.email)
+
     
 @router.get("/users/{user_id}", response_model=UserGetResponse)
 async def get_user(user_id: int, db: Session = Depends(get_db)):
@@ -36,6 +55,12 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @router.put("/users/{user_id}", response_model=UserGetResponse)
 async def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
+    try:
+        validate_user_name(user.name)
+        validate_password(user.password)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    
     db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
