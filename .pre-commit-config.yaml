@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: generate-openapi-json
+        name: Generate OpenAPI JSON
+        entry: python scripts/generate_openapi.py
+        language: system
+        pass_filenames: false
+      - id: add-openapi-json
+        name: Add OpenAPI JSON to commit
+        entry: git add openapi.json
+        language: system
+        pass_filenames: false
