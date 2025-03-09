@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Review
-from app.schemas import ReviewPostRequest, ReviewGetResponse, ReviewUpdate
+from .schemas.reviews import ReviewBase, ReviewGetResponse, ReviewUpdate
 
 router = APIRouter()
 
@@ -15,7 +15,7 @@ def validate_comment(comment: str):
         raise ValueError("Comment must be less than 1000 characters")
 
 @router.post("/reviews")
-async def create_review(review: ReviewPostRequest, db: Session = Depends(get_db)):
+async def create_review(review: ReviewBase, db: Session = Depends(get_db)):
     try:
         validate_rating(review.rating)
         validate_comment(review.comment)
