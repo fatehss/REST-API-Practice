@@ -45,7 +45,7 @@ class Order(Base, TimestampMixin):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     total_price = Column(Float, nullable=False)
-    status = Column(Enum("pending", "shipped", "delivered", "cancelled", name="order_status"), default="pending")
+    status = Column(Enum("pending", "processing", "shipped", "delivered", "cancelled", name="order_status"), default="pending")
 
     user = relationship("User", back_populates="orders")
     payments = relationship("Payment", back_populates="order")
